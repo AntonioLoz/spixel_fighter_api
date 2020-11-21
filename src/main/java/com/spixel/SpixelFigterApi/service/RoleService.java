@@ -16,6 +16,7 @@ public class RoleService {
     private RoleRepository repository;
 
     public Role findByName(ERole role) throws RoleNotFoundException {
+
         return repository.findByName(role).orElseThrow(() -> new RoleNotFoundException("Role not found"));
     }
 }

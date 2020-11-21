@@ -1,6 +1,7 @@
 package com.spixel.SpixelFigterApi.models;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,17 +14,16 @@ import java.util.Set;
 
 public class SignupRequest {
 
-    private String email;
     private String username;
-    private String firstName;
-    private String lastName;
-    private Date birthday;
-    private Long exp;
-    private Integer level;
-    private String registered;
-    private String gender;
     private String password;
-    private Set<String> roles = new HashSet<>();
+    private String firstname;
+    private String lastname;
+    private String email;
+    private LocalDate birthday;
+    private String gender;
+    private Set<String> roles;
+
+
 
     public String getEmail() {
         return email;
@@ -41,52 +41,28 @@ public class SignupRequest {
         this.username = username;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirstname(String firstName) {
+        this.firstname = firstName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLastname(String lastName) {
+        this.lastname = lastName;
     }
 
-    public Date getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
-    }
-
-    public Long getExp() {
-        return exp;
-    }
-
-    public void setExp(Long exp) {
-        this.exp = exp;
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public String getRegistered() {
-        return registered;
-    }
-
-    public void setRegistered(String registered) {
-        this.registered = registered;
     }
 
     public String getGender() {
@@ -111,5 +87,18 @@ public class SignupRequest {
 
     public void setRoles(Set<String> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public String toString() {
+        return "SignupRequest{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
+                ", birthday=" + birthday +
+                ", gender='" + gender + '\'' +
+                '}';
     }
 }

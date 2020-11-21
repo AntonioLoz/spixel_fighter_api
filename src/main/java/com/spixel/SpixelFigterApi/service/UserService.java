@@ -39,16 +39,18 @@ public class UserService {
             userOut.setBirthday(user.getBirthday());
             userOut.setEmail(user.getEmail());
             userOut.setExp(user.getExp());
-            userOut.setFirstName(user.getFirstName());
-            userOut.setLastName(user.getLastName());
+            userOut.setFirstname(user.getFirstname());
+            userOut.setLastname(user.getLastname());
             userOut.setGender(user.getGender());
             userOut.setLevel(user.getLevel());
             userOut.setPassword(user.getPassword());
         }
         else {
-            repository.save(user);
+            userOut = user;
+
         }
-        return user;
+        repository.save(userOut);
+        return userOut;
     }
 
     public void deleteUserById(Integer id) throws UserNotFoundException {

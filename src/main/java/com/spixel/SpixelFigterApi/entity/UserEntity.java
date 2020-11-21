@@ -7,6 +7,7 @@ import org.springframework.lang.NonNull;
 import javax.persistence.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -15,7 +16,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(columnNames = "email"),
-        @UniqueConstraint(columnNames = "user_name")
+        @UniqueConstraint(columnNames = "username")
 })
 public class UserEntity {
 
@@ -26,17 +27,17 @@ public class UserEntity {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Column(name = "user_name", nullable = false, length = 20)
+    @Column(nullable = false, length = 20)
     private String username;
 
-    @Column(name = "first_name", length = 20, nullable = false)
-    private String firstName;
+    @Column(length = 20, nullable = false)
+    private String firstname;
 
-    @Column(name = "last_name", length = 30, nullable = false)
-    private String lastName;
+    @Column(length = 40, nullable = false)
+    private String lastname;
 
     @Column(name = "birthday", nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column(name = "exp")
     private Long exp;
@@ -44,35 +45,32 @@ public class UserEntity {
     @Column(name = "level")
     private Integer level;
 
-    @Column(name = "registered")
+    @Column(name = "registered_at", updatable = false)
     private String registered;
 
-    @Column(name = "gender", nullable = false, length = 10)
+    @Column(name = "gender", nullable = false, length = 1)
     private String gender;
 
-    @Column(name = "password", nullable = false, length = 50)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-               joinColumns = @JoinColumn(name = "user_id"),
-               inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = "users_roles",
+               joinColumns = @JoinColumn(name = "id_users"),
+               inverseJoinColumns = @JoinColumn(name = "id_roles"))
     private Set<Role> roles = new HashSet<>();
 
     public UserEntity() {
     }
 
-    public UserEntity(String email, String username, String firstName, String lastName, Date birthday, Long exp, Integer level, String gender, String password) {
+    public UserEntity(String email, String username, String firstname, String lastname, LocalDate birthday, Long exp, Integer level, String gender, String password) {
         this.email = email;
         this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.birthday = birthday;
         this.exp = exp;
         this.level = level;
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyy HH:mm:ss");
-
-        this.registered = dateFormat.format(new Date());
         this.gender = gender;
         this.password = password;
     }
@@ -97,27 +95,27 @@ public class UserEntity {
         this.username = username;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
-    public Date getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 
@@ -139,10 +137,6 @@ public class UserEntity {
 
     public String getRegistered() {
         return registered;
-    }
-
-    public void setRegistered(String registered) {
-        this.registered = registered;
     }
 
     public String getGender() {
@@ -172,15 +166,18 @@ public class UserEntity {
     @Override
     public String toString() {
         return "UserEntity{" +
-                "email='" + email + '\'' +
+                "id=" + id +
+                ", email='" + email + '\'' +
                 ", username='" + username + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
                 ", birthday=" + birthday +
                 ", exp=" + exp +
                 ", level=" + level +
-                ", registered=" + registered +
+                ", registered='" + registered + '\'' +
                 ", gender='" + gender + '\'' +
+                ", password='" + password + '\'' +
+                ", roles=" + roles +
                 '}';
     }
 

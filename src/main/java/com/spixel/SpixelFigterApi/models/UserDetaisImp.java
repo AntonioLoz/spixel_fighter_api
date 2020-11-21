@@ -5,6 +5,7 @@ import com.spixel.SpixelFigterApi.entity.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
  * UserDetails para añadirle el email, ya que vamos a querer
  * logearnos a traves tanto del email como del username.
  */
+
 
 public class UserDetaisImp implements UserDetails {
 
@@ -90,7 +92,7 @@ public class UserDetaisImp implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     @Override

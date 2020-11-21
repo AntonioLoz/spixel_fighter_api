@@ -3,7 +3,7 @@ package com.spixel.SpixelFigterApi.models;
 public class LoginRequest {
 
     private String username;
-    private String passWord;
+    private String password;
 
     public String getUsername() {
         return username;
@@ -13,11 +13,19 @@ public class LoginRequest {
         this.username = username;
     }
 
-    public String getPassWord() {
-        return passWord;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
+    public void setPassword(String passWord) {
+        this.password = passWord;
+    }
+
+    @Override
+    public String toString() {
+        return "LoginRequest{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

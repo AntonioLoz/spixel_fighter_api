@@ -10,6 +10,8 @@ import com.spixel.SpixelFigterApi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,77 +47,102 @@ public class AuthController {
     JwtUtils jwtUtils;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassWord()));
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) throws Exception {
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword())
+        );
+
+        System.out.println("TEST[AuthController]: " + loginRequest.toString());
+
         String jwt = jwtUtils.generateJwttokent(authentication);
 
         UserDetaisImp userDetais = (UserDetaisImp) authentication.getPrincipal();
         List<String> roles = userDetais.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok(new JwtResponse(jwt, userDetais.getId(), userDetais.getUsername(), userDetais.getEmail(), roles));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signupRequest) throws RoleNotFoundException {
         if (userService.existByUsername(signupRequest.getUsername())) {
+
             return ResponseEntity
                     .badRequest()
-                    .body( "");
+                    .body( new MessageResponse("Username is already in use!"));
         }
 
         if (userService.existByEmail(signupRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+                    .body(new MessageResponse("Email is already in use!"));
         }
 
 
-        UserEntity user = new UserEntity(signupRequest.getEmail(), signupRequest.getUsername(), signupRequest.getFirstName(),
-                signupRequest.getLastName(), signupRequest.getBirthday(), (long) 0, 0, signupRequest.getGender(),
+        UserEntity user = new UserEntity(signupRequest.getEmail(), signupRequest.getUsername(), signupRequest.getFirstname(),
+                signupRequest.getLastname(), signupRequest.getBirthday(), (long) 0, 0, signupRequest.getGender(),
                 passwordEncoder.encode(signupRequest.getPassword()));
 
         Set<String> strRoles = signupRequest.getRoles();
         Set<Role> roles = new HashSet<>();
 
-        roles.add(roleService.findByName(ERole.ROLE_USER));
-
         // TODO Terminar de implementar la autorizacion decidiendo los roles que vamos a necesitar
 
-        /*if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        if (strRoles == null) {
+            Role userRole = roleService.findByName(ERole.ROLE_USER);
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        Role adminRole = null;
+                        try {
+                            adminRole = roleService.findByName(ERole.ROLE_ADMIN);
+                        } catch (RoleNotFoundException e) {
+                            e.printStackTrace();
+                        }
                         roles.add(adminRole);
 
                         break;
                     case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        Role modRole = null;
+                        try {
+                            modRole = roleService.findByName(ERole.ROLE_MODERATOR);
+                        } catch (RoleNotFoundException e) {
+                            e.printStackTrace();
+                        }
                         roles.add(modRole);
 
                         break;
                     default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        Role userRole = null;
+                        try {
+                            userRole = roleService.findByName(ERole.ROLE_USER);
+                        } catch (RoleNotFoundException e) {
+                            e.printStackTrace();
+                        }
                         roles.add(userRole);
                 }
             });
-        }*/
+        }
 
         user.setRoles(roles);
         userService.createUserOrUpdate(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    private void authenticate(String username, String password) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        }
+        catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        }
+        catch (BadCredentialsException e){
+            throw new Exception("INVALID_CREDENTIALS", e);
+        }
     }
 }
